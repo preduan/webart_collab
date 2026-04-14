@@ -1,17 +1,23 @@
+let generatedCircles = null;
+
 function generateRandomCutouts() {
     const imageContainers = document.querySelectorAll('.image-container');
     
-    // Generate one set of random circles that will be used for all images
-    const numCircles = 8;
-    const circles = [];
-    
-    for (let i = 0; i < numCircles; i++) {
-        circles.push({
-            x: Math.random() * 100,
-            y: Math.random() * 100,
-            r: Math.random() * 6 + 2
-        });
+    // Generate circles only once
+    if (generatedCircles === null) {
+        generatedCircles = [];
+        const numCircles = 8;
+        
+        for (let i = 0; i < numCircles; i++) {
+            generatedCircles.push({
+                x: Math.random() * 100,
+                y: Math.random() * 100,
+                r: Math.random() * 6 + 2
+            });
+        }
     }
+    
+    const circles = generatedCircles;
     
     // Apply circles to each canvas
     imageContainers.forEach((container, index) => {
