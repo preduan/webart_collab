@@ -1,53 +1,28 @@
 body {
     margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #ffffff;
-    position: relative;
+    overflow: hidden;
+    background: black;
 }
 
-.background-text {
+.fullscreen-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.bg-img {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    pointer-events: none;
-    z-index: 0;
-    padding: 40px;
-    font-size: 28px;
-    line-height: 2.2;
-    color: rgba(0, 0, 0, 0.3);
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    box-sizing: border-box;
-}
-
-.collage {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 16px;
-    box-sizing: border-box;
-    position: relative;
-    z-index: 1;
-}
-
-.image-container {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1 / 0.75;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.collage img {
-    width: 100%;
     height: 100%;
     object-fit: cover;
+    display: none;
+}
+
+.bg-img.active {
     display: block;
 }
 
@@ -60,17 +35,30 @@ body {
     pointer-events: none;
 }
 
-@media (max-width: 768px) {
-    .collage {
-        grid-template-columns: 1fr;
-        gap: 12px;
-        padding: 12px;
-    }
+#poem-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
-@media (max-width: 480px) {
-    .collage {
-        gap: 8px;
-        padding: 8px;
-    }
+.poem-line {
+    display: none;
+    color: yellow;
+    font-size: 3.5rem;
+    text-align: left;
+    padding: 0 10%;
+    line-height: 1.6;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+    user-select: none;
+}
+
+.poem-line.active {
+    display: block;
 }

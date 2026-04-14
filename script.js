@@ -1,86 +1,73 @@
-let generatedCircles = null;
-
 function generateRandomCutouts() {
-    const imageContainers = document.querySelectorAll('.image-container');
-    
-    // Generate circles only once
-    if (generatedCircles === null) {
-        generatedCircles = [];
-        const numCircles = 8;
-        
-        for (let i = 0; i < numCircles; i++) {
-            generatedCircles.push({
-                x: Math.random() * 100,
-                y: Math.random() * 100,
-                r: Math.random() * 6 + 2
-            });
-        }
+    const canvas = document.querySelector('.cutout-canvas');
+    const activeImg = document.querySelector('.bg-img.active');
+
+    const numCircles = 8;
+    const circles = [];
+
+    for (let i = 0; i < numCircles; i++) {
+        circles.push({
+            x: Math.random() * 100,
+            y: Math.random() * 100,
+            r: Math.random() * 6 + 2
+        });
     }
-    
-    const circles = generatedCircles;
-    
-    // Apply circles to each canvas
-    imageContainers.forEach((container, index) => {
-        const img = container.querySelector('img');
-        const canvas = container.querySelector('.cutout-canvas');
-        
-        // Determine which image to use for the cutouts
-        let sourceImg = img;
-        if (index === 0) {
-            // Bird uses pool circles
-            sourceImg = imageContainers[2].querySelector('img');
-        } else if (index === 1) {
-            // Cat uses red circles
-            sourceImg = imageContainers[3].querySelector('img');
-        } else if (index === 2) {
-            // Pool uses bird circles
-            sourceImg = imageContainers[0].querySelector('img');
-        } else if (index === 3) {
-            // Red uses cat circles
-            sourceImg = imageContainers[1].querySelector('img');
+
+    // Get the other (non-active) image as the source for cutout circles
+    const imgs = document.querySelectorAll('.bg-img');
+    const sourceImg = imgs[0].classList.contains('active') ? imgs[1] : imgs[0];
+
+    function draw() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        circles.forEach((circle) => {
+            const cx = (circle.x / 100) * width;
+            const cy = (circle.y / 100) * height;
+            const cr = (circle.r / 100) * width;
+
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(sourceImg, 0, 0, width, height);
+            ctx.restore();
+        });
+    }
+
+    if (sourceImg.complete) {
+        draw();
+    } else {
+        sourceImg.onload = draw;
+    }
+}
+
+function setupPoemOverlay() {
+    const overlay = document.getElementById('poem-overlay');
+    const lines = document.querySelectorAll('.poem-line');
+    const imgs = document.querySelectorAll('.bg-img');
+    let currentLine = 0;
+
+    overlay.addEventListener('click', () => {
+        lines[currentLine].classList.remove('active');
+        currentLine = (currentLine + 1) % lines.length;
+        lines[currentLine].classList.add('active');
+
+        // When looping back to first line, swap the background image
+        if (currentLine === 0) {
+            imgs.forEach(img => img.classList.toggle('active'));
         }
-        
-        // Wait for image to load to get actual dimensions
-        if (sourceImg.complete) {
-            drawCircles(canvas, sourceImg, circles);
-        } else {
-            sourceImg.onload = () => {
-                drawCircles(canvas, sourceImg, circles);
-            };
-        }
+
+        generateRandomCutouts();
     });
 }
 
-function drawCircles(canvas, img, circles) {
-    const rect = canvas.parentElement.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    
-    canvas.width = width;
-    canvas.height = height;
-    
-    const ctx = canvas.getContext('2d');
-    
-    // Draw circles with image content
-    circles.forEach((circle) => {
-        const circleX = (circle.x / 100) * width;
-        const circleY = (circle.y / 100) * height;
-        const circleRadius = (circle.r / 100) * width;
-        
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
-        ctx.clip();
-        
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        ctx.restore();
-    });
-}
+document.addEventListener('DOMContentLoaded', () => {
+    generateRandomCutouts();
+    setupPoemOverlay();
+});
 
-// Generate cutouts when page loads
-document.addEventListener('DOMContentLoaded', generateRandomCutouts);
-
-// Also regenerate on window resize to maintain accuracy
 window.addEventListener('resize', generateRandomCutouts);
-
