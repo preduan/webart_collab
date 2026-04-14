@@ -49,9 +49,14 @@ function setupPoemOverlay() {
     const overlay = document.getElementById('poem-overlay');
     const lines = document.querySelectorAll('.poem-line');
     const imgs = document.querySelectorAll('.bg-img');
+    const shutterSound = document.getElementById('shutterSound');
     let currentLine = 0;
 
     overlay.addEventListener('click', () => {
+        // Play camera shutter sound
+        shutterSound.currentTime = 0;
+        shutterSound.play();
+
         lines[currentLine].classList.remove('active');
         currentLine = (currentLine + 1) % lines.length;
         lines[currentLine].classList.add('active');
