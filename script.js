@@ -73,6 +73,68 @@ function setupPoemOverlay() {
 document.addEventListener('DOMContentLoaded', () => {
     generateRandomCutouts();
     setupPoemOverlay();
+    setupMouseTracking();
 });
 
 window.addEventListener('resize', generateRandomCutouts);
+
+function setupMouseTracking() {
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        
+        // Update active poem line with character-level wrapping
+        const activeLine = document.querySelector('.poem-line.active');
+        if (activeLine) {
+            // Create spans for each character if not already done
+            if (!activeLine.classList.contains('char-wrapped')) {
+                const originalHTML = activeLine.innerHTML;
+                let newHTML = '';
+                let i = 0;
+                while (i < originalHTML.length) {
+                    // Check if we're at the start of an HTML tag
+                    if (originalHTML[i] === '<') {
+                        const endTag = originalHTML.indexOf('>', i);
+                        newHTML += originalHTML.substring(i, endTag + 1);
+                        i = endTag + 1;
+                    } else if (originalHTML[i] === ' ') {
+                        newHTML += ' ';
+                        i++;
+                    } else {
+                        newHTML += `<span class="char">${originalHTML[i]}</span>`;
+                        i++;
+                    }
+                }
+                activeLine.innerHTML = newHTML;
+                activeLine.classList.add('char-wrapped');
+            }
+            
+            // Update each character's position
+            const chars = activeLine.querySelectorAll('.char');
+            chars.forEach(char => {
+                const charRect = char.getBoundingClientRect();
+                const charX = charRect.left + charRect.width / 2;
+                const charY = charRect.top + charRect.height / 2;
+                
+                const distX = mouseX - charX;
+                const distY = mouseY - charY;
+                const distance = Math.sqrt(distX * distX + distY * distY);
+                
+                // If mouse is close to character, apply repel effect
+                if (distance < 150) {
+                    const angle = Math.atan2(distY, distX);
+                    const pushDistance = Math.max(0, 150 - distance) * 0.3;
+                    const pushX = Math.cos(angle) * pushDistance;
+                    const pushY = Math.sin(angle) * pushDistance;
+                    
+                    char.style.transform = `translate(${pushX}px, ${pushY}px)`;
+                } else {
+                    char.style.transform = 'translate(0, 0)';
+                }
+            });
+        }
+    });
+}

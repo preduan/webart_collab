@@ -49,6 +49,38 @@ body {
 }
 
 .poem-line {
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    text-align: center;
+    color: white;
+    font-size: 24px;
+    max-width: 80%;
+    line-height: 1.6;
+}
+
+.poem-line.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.char {
+    display: inline-block;
+    transition: transform 0.1s ease-out;
+}
+
+#mouse-circle {
+    position: fixed;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 11;
+    display: none;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}.poem-line {
     display: none;
     color: yellow;
     font-size: 3.5rem;
